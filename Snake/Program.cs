@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Snake
@@ -10,26 +11,71 @@ namespace Snake
     {
         static void Main(string[] args)
         {
-            Point p1 = new Point(1,3,'*');
-            p1.Draw();
+            Console.SetBufferSize(80, 25);
 
-            Point p2 = new Point(4,5,'#');
-            p2.Draw();
+            Walls walls = new Walls(80, 25);
+            walls.Draw();
 
-            HorizontalLine hLine = new HorizontalLine(5,15,8,'_');
-            hLine.Drow();
-            VerticalLine vLine = new VerticalLine(9,14,5,'|');
-            vLine.Drow();
+            //Point p = new Point(4,5,'*');
+            //Snake snake = new Snake(p, 4, Direction.RIGHT);
 
-            HorizontalLine hLine1 = new HorizontalLine(5, 15, 15, '_');
-            hLine1.Drow();
-            VerticalLine vLine1 = new VerticalLine(9, 14, 15, '|');
-            vLine1.Drow();
+            //snake.Draw();
+
+            FoodCreator foodCreator = new FoodCreator(80, 25, '$');
+            Point food = foodCreator.CreateFood();
+            food.Draw();
+
+            VerticalLine vl = new VerticalLine(0, 10, 5, '%');
+            Draw(vl);
+
+            Point p1 = new Point(4, 5, '*');
+            Figure fSnake = new Snake(p1, 4, Direction.RIGHT);
+            Draw(fSnake);
+            Snake snake = (Snake)fSnake;
 
 
+            while (true)
+            {
+                if ( walls.IsHit(snake) || snake.IsHitTail())
+                {
+                    break;
+                }
+                if(snake.Eat(food))
+                {
+                    food = foodCreator.CreateFood();
+                    food.Draw();
+                }
+                else
+                {
+                    snake.Move();
+                }
+                Thread.Sleep(300);
+
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey();
+                    snake.HandlKey(key.Key);
+
+                }
+            }
+
+            while (true)
+            {
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey();
+                    snake.HandlKey(key.Key);
+                }
+                Thread.Sleep(300);
+                snake.Move();
+           }
 
             Console.ReadLine();
         }
 
+        static void Draw(Figure figure)
+        {
+            figure.Draw();
+        }
     }
 }
